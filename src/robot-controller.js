@@ -1,10 +1,17 @@
-
-
 const RobotService = require('../src/robot-service');
+const RobotPayloadValidator = require('./robot-payload-validator');
+
+
 class robotController {
-    static async navigateRobot(req, res)  {
-        const { roomSize, initLocation, command } = req.body;
+    static navigateRobot(req, res)  {
+        const robotPayloadValidator = new RobotPayloadValidator(req)
+        const isPayloadValid = robotPayloadValidator.validatePayload();
+        if (!isPayloadValid) {
+            res.status(400).json({ error: 'Invalid payload' });
+            return;
+        }
         try {
+            const { roomSize, initLocation, command } = req.body;
             const robotService = new RobotService({
                 width:roomSize.width ,
                 length:roomSize.length})
